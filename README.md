@@ -10,7 +10,8 @@ Showman, stacking jokers and the Deck of Equilibrium. You and your friends end u
 exact same versions and can meet in an online lobby. Switch between vanilla jokers, modded
 jokers and everything at once with one preset command.
 
-**Windows: run one line in PowerShell, or double-click `Shades-Setup.bat` from [Releases](https://github.com/Sayandeep1013/Shades-of-Balatro/releases).**
+**Windows: run one line in PowerShell, or double-click `Shades-Setup.bat` from [Releases](https://github.com/Sayandeep1013/Shades-of-Balatro/releases).
+Android: `ShadesOfBalatro.apk` on the same page, set up from your PC with `shades phone`.**
 
 ![A PvP blind against a PC player, played on a phone](docs/screenshots/01-pvp-blind.jpg)
 
@@ -87,8 +88,9 @@ Both open this menu:
   1) Install / repair everything
   2) Check my setup
   3) Switch preset (which mods are on)
-  4) Uninstall
-  5) Quit
+  4) Set up my Android phone (USB)
+  5) Uninstall
+  6) Quit
 ```
 
 A full install from nothing takes about a minute and a half (Pokermon is a 55 MB download). It leaves:
@@ -113,6 +115,7 @@ or clone the repo and run `.\shades.ps1 <command>`:
 | `check` | Lists Lovely and each mod: installed version, wanted version, on/off. Exit code 1 if anything is off |
 | `preset <name>` | Switches which mods are on |
 | `presets` | Lists presets and marks the current one |
+| `phone` | Installs the app on a USB-connected Android phone and syncs your Balatro.exe, mods and preset |
 | `uninstall` | Moves Lovely and the pack's mods to a backup folder. Balatro is vanilla again |
 
 Options: `-GameDir <folder>` if Balatro isn't in a Steam library, `-ModsDir`, `-NoShortcuts`, `-Yes`.
@@ -142,20 +145,35 @@ build, and the installer refuses any file whose SHA-256 differs from the one pin
 
 ## Android
 
-**Status: a single game-free APK is in progress.** On first launch it will ask for *your own*
-`Balatro.exe` and install the pack, the same way projects like Balatro-Lite work. The APK can't
-include Balatro itself. Until it ships, this route works and is what the screenshots above were taken on:
+The phone app is a **game-free APK**: LÖVE 11.5 with Lovely 0.10 built in, a small launcher and
+nothing from Balatro. It runs **your own `Balatro.exe`**, taken from your PC.
 
-1. On a PC, open [Lovely Mobile Maker](https://lmm.shorty.systems), give it your Steam `Balatro.exe`,
-   choose Android and install the APK it makes on your phone. It has Lovely 0.10 built in.
-2. Launch it once, then install [Material Files](https://f-droid.org/packages/me.zhanghai.android.files/):
-   *menu → Add storage → External storage → the app → Use this folder*.
-3. Copy the folders from your PC's `%AppData%\Balatro\Mods` (after running the installer) into `ASET/Mods`.
-   Mobile Memory Fix is what keeps Pokermon from crashing the phone.
+**With a PC (recommended).** Plug the phone in with USB, then run option **4) Set up my Android
+phone** from the menu, or:
 
-Tested on an 8 GB phone (Snapdragon 7s Gen 3): Multiplayer hosting, joining, PvP, reconnecting and
-saving all work, at 0.5-1.0 GB of RAM depending on the preset.
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/Sayandeep1013/Shades-of-Balatro/main/shades.ps1))) phone
+```
 
+It downloads Google's adb, walks you through turning on USB debugging, installs
+`ShadesOfBalatro.apk` from the latest [Release](https://github.com/Sayandeep1013/Shades-of-Balatro/releases)
+(SHA-256 checked), copies your `Balatro.exe` into the app's private folder, mirrors your PC's mods
+and preset, and starts the game. Run it again after switching presets so the phone matches.
+
+**Without a PC.** Install `ShadesOfBalatro.apk` from Releases, open it once, then use
+[Material Files](https://f-droid.org/packages/me.zhanghai.android.files/) (*menu → Add storage →
+External storage → Shades of Balatro → Use this folder*) to copy your `Balatro.exe` into the app's
+folder, and the mod folders into `Mods`. The app shows these steps if `Balatro.exe` is missing.
+
+How the launcher works: `Balatro.exe` is a LÖVE game with a zip appended, so
+[`android/launcher/conf.lua`](android/launcher/conf.lua) mounts it from the save folder before the
+game starts. The game's own `main.lua` is then the only one, so it boots and Lovely patches it
+exactly as on a normal install. The launcher ships no `main.lua` because Lovely appends Steamodded
+to any file with that name.
+
+The modpack itself was tested on an 8 GB phone (Snapdragon 7s Gen 3): Multiplayer hosting, joining,
+PvP, reconnecting and saving all work, at 0.5-1.0 GB of RAM depending on the preset. The launcher
+was verified on Windows with the same LÖVE 11.5; the first on-phone run of the APK is pending.
 ## The mods
 
 | Mod | Version | What it adds | Licence |
@@ -182,8 +200,12 @@ Steamodded Multiplayer standardises on, so it's not in this pack.
 PowerShell 5.1 (built into Windows) for the installer, Lua for the two mods. No runtime to install.
 
 ```
-shades.ps1            the installer: find Balatro, Lovely, pinned downloads + SHA-256, presets, shortcuts, check, uninstall
+shades.ps1            the installer: find Balatro, Lovely, pinned downloads + SHA-256, presets, shortcuts, check, phone, uninstall
 Shades-Setup.bat      double-click wrapper that runs the latest shades.ps1
+android/launcher/      conf.lua: mounts the player's Balatro.exe and hands over to the game
+android/build-apk.sh  LMM base APK (pinned) + launcher + icon -> signed, game-free APK
+android/icon/         original icon, drawn in code
+.github/workflows/    builds and attaches the APK to every v* release
 modpack.json          the pack: every mod's version, URL, SHA-256 and folder, plus the presets
 mods/MobileMemFix/    frees spare sprite-sheet copies; 1x art for oversized mods on phones
 mods/EquilibriumDeck/ Cryptid's Deck of Equilibrium on its own (shop hooks + save/load patch + deck art)
@@ -222,7 +244,8 @@ How the installer works:
 | | |
 |---|---|
 | v1.0.0 | Windows installer, five presets, Mobile Memory Fix, Deck of Equilibrium |
-| Next | Game-free Android APK that imports your own `Balatro.exe` and installs the pack on first launch |
+| v1.1.0 | Game-free Android APK built in CI; `shades phone` installs it over USB with your own `Balatro.exe`, mods and preset |
+| Next | Confirm the APK on more phones; an in-app file picker for `Balatro.exe` |
 
 ## Credits
 
