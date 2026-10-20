@@ -1,0 +1,57 @@
+name: android
+
+# Builds the game-free Shades of Balatro APK. Pushing a tag like v1.1.0 attaches
+# ShadesOfBalatro.apk (+ .sha256) to that release, which is what `shades phone` installs.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Version from tag
+        id: v
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then name="${GITHUB_REF#refs/tags/v}"; else name="0.0.0-dev"; fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "code=$GITHUB_RUN_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Build and sign
+        env:
+          SHADES_KEYSTORE_B64: ${{ secrets.SHADES_KEYSTORE_B64 }}
+          SHADES_KEYSTORE_PASS: ${{ secrets.SHADES_KEYSTORE_PASS }}
+          VERSION_NAME: ${{ steps.v.outputs.name }}
+          VERSION_CODE: ${{ steps.v.outputs.code }}
+        run: |
+          echo "$SHADES_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/shades.jks"
+          SHADES_KEYSTORE="$RUNNER_TEMP/shades.jks" bash android/build-apk.sh
+          cd android/dist
+          cp "ShadesOfBalatro-$VERSION_NAME.apk" ShadesOfBalatro.apk
+          sha256sum ShadesOfBalatro.apk > ShadesOfBalatro.apk.sha256
+          cat ShadesOfBalatro.apk.sha256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ShadesOfBalatro-apk
+          path: android/dist/ShadesOfBalatro.apk*
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --title "Shades of Balatro ${tag#v}" --notes "See README."
+          gh release upload "$tag" android/dist/ShadesOfBalatro.apk android/dist/ShadesOfBalatro.apk.sha256 --clobber

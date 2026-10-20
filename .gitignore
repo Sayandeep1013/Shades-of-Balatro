@@ -9,3 +9,5 @@ Mods-backup*/
 ShadesBackups/
 cache/
 *.log
+android/build/
+android/dist/

@@ -18,12 +18,13 @@
     .\shades.ps1 check                # report what is installed vs. the modpack
     .\shades.ps1 preset stacking      # switch which mods are on
     .\shades.ps1 presets              # list presets
+    .\shades.ps1 phone                # install the app on a USB-connected Android phone and sync mods
     .\shades.ps1 uninstall            # remove Lovely + managed mods (backed up first)
 #>
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('menu', 'install', 'check', 'preset', 'presets', 'uninstall', 'help')]
+    [ValidateSet('menu', 'install', 'check', 'preset', 'presets', 'phone', 'uninstall', 'help')]
     [string]$Command = 'menu',
     [Parameter(Position = 1)]
     [string]$Name,
@@ -427,6 +428,133 @@ function Invoke-Uninstall {
     Say "Balatro is vanilla again. Backups: $BackupRoot" Green
 }
 
+# ---------------------------------------------------------------- phone (Android over adb)
+
+function Get-Adb($android) {
+    $onPath = Get-Command adb -ErrorAction SilentlyContinue
+    if ($onPath) { return $onPath.Source }
+    $adb = Join-Path $Home_ 'platform-tools\adb.exe'
+    if (Test-Path $adb) { return $adb }
+    $zip = Get-Verified $android.adb.url $android.adb.sha256 "platform-tools-$($android.adb.version).zip"
+    Expand-Archive -Path $zip -DestinationPath $Home_ -Force
+    return $adb
+}
+
+function Invoke-Adb([string]$adb, [string[]]$arguments, [switch]$Quiet) {
+    # adb writes progress to stderr; under 'Stop' Windows PowerShell 5.1 would treat that as a failure.
+    $ErrorActionPreference = 'Continue'
+    $out = & $adb @arguments 2>&1 | ForEach-Object { "$_" }
+    if ($LASTEXITCODE -ne 0) { throw "adb $($arguments -join ' ') failed: $($out -join ' ')" }
+    if (-not $Quiet) { return $out }
+}
+
+# Runs adb and returns its output lines without treating stderr or a non-zero exit as fatal;
+# callers inspect the text (and $LASTEXITCODE) themselves.
+function Invoke-AdbRaw([string]$adb, [string[]]$arguments) {
+    $ErrorActionPreference = 'Continue'
+    & $adb @arguments 2>&1 | ForEach-Object { "$_" }
+}
+
+function Wait-Phone([string]$adb) {
+    while ($true) {
+        $lines = Invoke-AdbRaw $adb @('devices') | Select-Object -Skip 1 | Where-Object { $_.Trim() }
+        $ready = @($lines | Where-Object { $_ -match '\tdevice$' })
+        $unauth = @($lines | Where-Object { $_ -match '\tunauthorized$' })
+        if ($ready.Count -eq 1) { return ($ready[0] -split '\t')[0] }
+        if ($ready.Count -gt 1) { throw 'More than one phone is connected. Unplug the others and run this again.' }
+        Say ''
+        if ($unauth.Count -gt 0) {
+            Say 'The phone is connected but has not allowed this PC yet.' Yellow
+            Say '  Unlock the phone and tap "Allow" on the USB debugging prompt (tick "Always allow").'
+        } else {
+            Say 'No phone found. On the phone:' Yellow
+            Say '  1. Settings > About phone > tap "Build number" 7 times (turns on Developer options)'
+            Say '  2. Settings > System > Developer options > turn on "USB debugging"'
+            Say '  3. Plug the phone into this PC with a USB cable (a data cable, not charge-only)'
+            Say '  4. Unlock it and tap "Allow" when it asks about USB debugging'
+        }
+        if ((Read-Host 'Press Enter to check again, or type q to quit') -eq 'q') { throw 'Cancelled.' }
+    }
+}
+
+function Invoke-Phone {
+    $manifest = Get-Manifest
+    $android = $manifest.android
+    $pkg = $android.package
+    $root = $android.save_root
+
+    Say ''
+    Say 'Shades of Balatro  -  set up a phone' White
+
+    Step 'This PC'
+    $game = Find-Balatro
+    Ok "Balatro found: $game"
+    $missing = @($manifest.mods | Where-Object { -not (Get-InstalledVersion (Join-Path $ModsDir $_.folder) $_) })
+    if ($missing.Count -gt 0) {
+        Warn 'The modpack is not installed on this PC yet; installing it first (the phone gets the same mods).'
+        Invoke-Install $null
+    } else { Ok 'Modpack installed; the phone will get the same mods and preset' }
+
+    Step 'Phone connection'
+    $adb = Get-Adb $android
+    $serial = Wait-Phone $adb
+    $model = (Invoke-Adb $adb @('-s', $serial, 'shell', 'getprop', 'ro.product.model')) -join ''
+    Ok "Connected: $model ($serial)"
+    $a = @('-s', $serial)
+
+    Step 'App'
+    $apk = Join-Path $Cache $android.apk_asset
+    New-Item -ItemType Directory -Force $Cache | Out-Null
+    $base = "https://github.com/$Repo/releases/latest/download"
+    Say "         downloading $base/$($android.apk_asset)"
+    Invoke-WebRequest -Uri "$base/$($android.apk_asset)" -OutFile $apk -UseBasicParsing
+    $want = ((Invoke-WebRequest -Uri "$base/$($android.apk_asset).sha256" -UseBasicParsing).Content -split '\s+')[0]
+    if ((Get-FileHash $apk -Algorithm SHA256).Hash -ne $want.ToUpper()) { throw 'The downloaded APK does not match its published SHA-256. Try again later.' }
+    $res = Invoke-AdbRaw $adb ($a + @('install', '-r', $apk))
+    if (($res -join ' ') -match 'INSTALL_FAILED_UPDATE_INCOMPATIBLE') {
+        throw "An older Shades of Balatro signed with a different key is installed. Uninstall it from the phone (its saves go with it) and run this again."
+    }
+    if ($LASTEXITCODE -ne 0) { throw "Installing the app failed: $($res -join ' ')" }
+    Ok 'Shades of Balatro app installed / updated'
+    Invoke-Adb $adb ($a + @('shell', 'am', 'force-stop', $pkg)) -Quiet
+    Invoke-Adb $adb ($a + @('shell', 'run-as', $pkg, 'mkdir', '-p', "$root/Mods")) -Quiet
+
+    Step 'Your Balatro.exe'
+    $exe = Join-Path $game 'Balatro.exe'
+    $localSha = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLower()
+    $phoneSha = (Invoke-AdbRaw $adb ($a + @('shell', 'run-as', $pkg, 'sha256sum', "$root/Balatro.exe"))) -join ''
+    if ($phoneSha.StartsWith($localSha)) { Ok 'Already on the phone (identical)' }
+    else {
+        Say '         copying (about 55 MB)'
+        Invoke-Adb $adb ($a + @('push', $exe, '/data/local/tmp/shades_Balatro.exe')) -Quiet
+        Invoke-Adb $adb ($a + @('shell', 'run-as', $pkg, 'cp', '/data/local/tmp/shades_Balatro.exe', "$root/Balatro.exe")) -Quiet
+        Invoke-Adb $adb ($a + @('shell', 'rm', '-f', '/data/local/tmp/shades_Balatro.exe')) -Quiet
+        Ok 'Copied from this PC into the app (stays private to the app)'
+    }
+
+    Step 'Mods'
+    $tmp = '/data/local/tmp/shades_mods'
+    Invoke-Adb $adb ($a + @('shell', 'rm', '-rf', $tmp)) -Quiet
+    Invoke-Adb $adb ($a + @('shell', 'mkdir', '-p', $tmp)) -Quiet
+    foreach ($mod in $manifest.mods) {
+        $dir = Join-Path $ModsDir $mod.folder
+        if (-not (Test-Path $dir)) { continue }
+        Invoke-Adb $adb ($a + @('push', $dir, "$tmp/")) -Quiet
+        Invoke-Adb $adb ($a + @('shell', 'run-as', $pkg, 'rm', '-rf', "$root/Mods/$($mod.folder)")) -Quiet
+        Invoke-Adb $adb ($a + @('shell', 'run-as', $pkg, 'cp', '-r', "$tmp/$($mod.folder)", "$root/Mods/")) -Quiet
+        $on = if (Test-Path (Join-Path $dir '.lovelyignore')) { 'off' } else { 'on' }
+        Ok ("{0,-22} {1}  [{2}]" -f $mod.name, $mod.version, $on)
+    }
+    Invoke-Adb $adb ($a + @('shell', 'rm', '-rf', $tmp)) -Quiet
+
+    Step 'Launch'
+    Invoke-Adb $adb ($a + @('shell', 'monkey', '-p', $pkg, '-c', 'android.intent.category.LAUNCHER', '1')) -Quiet
+    Ok 'Started "Shades of Balatro" on the phone'
+    Say ''
+    Say 'Done. The first launch takes about half a minute while the mods load.' Green
+    Say 'Run "shades phone" again after switching presets or updating, to sync the phone.' Gray
+}
+
 function Show-Menu {
     while ($true) {
         Say ''
@@ -434,13 +562,15 @@ function Show-Menu {
         Say '  1) Install / repair everything'
         Say '  2) Check my setup'
         Say '  3) Switch preset (which mods are on)'
-        Say '  4) Uninstall'
-        Say '  5) Quit'
+        Say '  4) Set up my Android phone (USB)'
+        Say '  5) Uninstall'
+        Say '  6) Quit'
         switch (Read-Host '  Choose') {
             '1' { Invoke-Install $Preset }
             '2' { [void](Invoke-Check) }
             '3' { Invoke-Preset $null }
-            '4' { Invoke-Uninstall }
+            '4' { Invoke-Phone }
+            '5' { Invoke-Uninstall }
             default { return }
         }
     }
@@ -455,6 +585,7 @@ try {
         'check' { Exit-With (Invoke-Check) }
         'preset' { Invoke-Preset $Name }
         'presets' { Invoke-Presets }
+        'phone' { Invoke-Phone }
         'uninstall' { Invoke-Uninstall }
         'help' { Get-Help $PSCommandPath -Detailed }
         default { Show-Menu }
