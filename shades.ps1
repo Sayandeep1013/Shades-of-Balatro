@@ -77,8 +77,10 @@ function Get-RawUrl([string]$path) { "https://raw.githubusercontent.com/$Repo/$R
 
 function Get-Manifest {
     if ($Source) { return Get-Content (Join-Path $Source 'modpack.json') -Raw | ConvertFrom-Json }
-    $local = Join-Path $PSScriptRoot 'modpack.json'
-    if ($PSScriptRoot -and (Test-Path $local)) { return Get-Content $local -Raw | ConvertFrom-Json }
+    # Run from a checkout: use the manifest next to the script. Run via irm | iex: there is no script folder.
+    if ($PSScriptRoot -and (Test-Path (Join-Path $PSScriptRoot 'modpack.json'))) {
+        return Get-Content (Join-Path $PSScriptRoot 'modpack.json') -Raw | ConvertFrom-Json
+    }
     return Invoke-RestMethod (Get-RawUrl 'modpack.json')
 }
 
