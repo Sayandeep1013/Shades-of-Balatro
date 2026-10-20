@@ -1,0 +1,22 @@
+# From Cryptid's lovely/equilibrium.toml (GPL-3.0): when a saved shop is reloaded, non-pack
+# cards sitting in pack slots must keep normal size, their playing-card front and their type.
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -1
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "G.shop_booster.T.y, G.CARD_W*1.27, G.CARD_H*1.27, G.P_CARDS.empty, G.P_CENTERS[G.GAME.current_round.used_packs[i]], {bypass_discovery_center = true, bypass_discovery_ui = true})"
+position = "at"
+payload = "G.shop_booster.T.y, G.CARD_W*(G.P_CENTERS[G.GAME.current_round.used_packs[i]].set == 'Booster' and 1.27 or 1), G.CARD_H*(G.P_CENTERS[G.GAME.current_round.used_packs[i]].set == 'Booster' and 1.27 or 1), (EQD and EQD.is_playing_card_center(G.P_CENTERS[G.GAME.current_round.used_packs[i]])) and pseudorandom_element(G.P_CARDS, pseudoseed('cry_equifrontbrium')) or G.P_CARDS.empty, G.P_CENTERS[G.GAME.current_round.used_packs[i]], {bypass_discovery_center = true, bypass_discovery_ui = true})"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "create_shop_card_ui(card, 'Booster', G.shop_booster)"
+position = "at"
+payload = "create_shop_card_ui(card, (EQD and EQD.is_playing_card_center(card.config.center)) and 'Base' or card.config.center.set, G.shop_booster)"
+match_indent = true

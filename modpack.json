@@ -1,0 +1,141 @@
+{
+  "name": "Shades of Balatro",
+  "modpack_version": "1.0.0",
+  "balatro_version": "1.0.1o",
+  "steam_app_id": 2379780,
+  "lovely": {
+    "version": "0.9.0",
+    "url": "https://github.com/ethangreen-dev/lovely-injector/releases/download/v0.9.0/lovely-x86_64-pc-windows-msvc.zip",
+    "sha256": "40b994a055ee75e5f2aba81e7ae06f2c17460e18cc346483089921899fadd1f7",
+    "dll": "version.dll",
+    "dll_sha256": "ccfed59e4d245b7802c684fc86708e0a937f584d6e07d1ecc11e8eae22f9fc1a",
+    "note": "0.9.x is the only Lovely the Multiplayer mod accepts for Ranked. Phones run 0.10.0 inside the APK."
+  },
+  "mods": [
+    {
+      "id": "smods",
+      "name": "Steamodded",
+      "version": "1.0.0~BETA-1620a",
+      "folder": "smods",
+      "url": "https://github.com/Steamodded/smods/archive/refs/tags/1.0.0-beta-1620a.zip",
+      "sha256": "c98754fdf009f0addd198fe062989ef0f5bf212220c54cc89ed27ad5b0ea56ec",
+      "marker": "version.lua",
+      "required": true,
+      "license": "GPL-3.0",
+      "home": "https://github.com/Steamodded/smods"
+    },
+    {
+      "id": "Multiplayer",
+      "name": "Balatro Multiplayer",
+      "version": "0.5.5",
+      "folder": "Multiplayer",
+      "url": "https://github.com/Balatro-Multiplayer/BalatroMultiplayer/releases/download/v0.5.5/BalatroMultiplayer-raw.zip",
+      "sha256": "20a99b53be6dcd1ce88cb6c3cebe3f112af9037ec545e0a827153f6eb0eacddb",
+      "marker": "Multiplayer.json",
+      "required": true,
+      "license": "GPL-3.0",
+      "home": "https://balatromp.com"
+    },
+    {
+      "id": "Handy",
+      "name": "Handy",
+      "version": "2.0.6",
+      "folder": "HandyBalatro",
+      "url": "https://github.com/SleepyG11/HandyBalatro/releases/download/v2.0.6/Handy-v2.0.6.zip",
+      "sha256": "07a3855d53ea14824e0a0c1bc263fc5432e2a106650591ce0de0eac83fc70be5",
+      "marker": "metadata.json",
+      "license": "GPL-3.0",
+      "home": "https://github.com/SleepyG11/HandyBalatro"
+    },
+    {
+      "id": "Pokermon",
+      "name": "Pokermon",
+      "version": "3.8.0",
+      "folder": "Pokermon",
+      "url": "https://github.com/InertSteak/Pokermon/releases/download/3.8.0/Pokermon-3.8.0.zip",
+      "sha256": "c065d538b96e18dd9ec1074791ee4235cc8dc9dc60de8878b2ec482da584b546",
+      "marker": "Pokermon.json",
+      "license": "GPL-3.0",
+      "home": "https://github.com/InertSteak/Pokermon"
+    },
+    {
+      "id": "ShenanigansDecks",
+      "name": "Shenanigans's Decks",
+      "version": "1.2",
+      "folder": "ShenanigansDecks",
+      "url": "https://github.com/ShenanigansBunul/balatro-shenanigans-decks/archive/refs/tags/1.2.zip",
+      "sha256": "2ac34a5981036f4ca9a8814053668de77036f5ae66c694e55e5ac232973acf98",
+      "marker": "ShenanigansDecks.json",
+      "license": "MIT",
+      "home": "https://github.com/ShenanigansBunul/balatro-shenanigans-decks"
+    },
+    {
+      "id": "CardSleeves",
+      "name": "Card Sleeves",
+      "version": "1.9.4",
+      "folder": "CardSleeves",
+      "url": "https://github.com/larswijn/CardSleeves/releases/download/v1.9.4/CardSleeves-1.9.4.zip",
+      "sha256": "49708a4b822031739a2f6f215bab53706db87f885486240f2a015aa8dfad2861",
+      "marker": "CardSleeves.json",
+      "license": "GPL-3.0",
+      "home": "https://github.com/larswijn/CardSleeves"
+    },
+    {
+      "id": "StackingJokers",
+      "name": "Stacking Jokers",
+      "version": "0.3.0",
+      "folder": "StackingJokers",
+      "url": "https://github.com/Michael-Andrzejewski/Stacking-Jokers/archive/e388f1eace4edbb3d7b76f19ae8d73b8c4c413e3.zip",
+      "sha256": "826119030bb8c812354c5175ac3c849d4729d1095b40121db63dfcc501fe340a",
+      "marker": "StackingJokers.json",
+      "license": "none published (downloaded from upstream, not redistributed)",
+      "home": "https://github.com/Michael-Andrzejewski/Stacking-Jokers"
+    },
+    {
+      "id": "MobileMemFix",
+      "name": "Mobile Memory Fix",
+      "version": "1.0.0",
+      "folder": "MobileMemFix",
+      "local": "mods/MobileMemFix",
+      "license": "GPL-3.0",
+      "home": "https://github.com/Sayandeep1013/Shades-of-Balatro"
+    },
+    {
+      "id": "EquilibriumDeck",
+      "name": "Deck of Equilibrium",
+      "version": "1.0.0",
+      "folder": "EquilibriumDeck",
+      "local": "mods/EquilibriumDeck",
+      "license": "GPL-3.0 (port of Cryptid's deck)",
+      "home": "https://github.com/Sayandeep1013/Shades-of-Balatro"
+    }
+  ],
+  "default_preset": "showman",
+  "presets": {
+    "showman": {
+      "label": "Showman + vanilla jokers",
+      "description": "Modded decks (Showman, Equilibrium, 31 Shenanigans decks, sleeves) with the normal joker pool.",
+      "enabled": ["smods", "Multiplayer", "Handy", "ShenanigansDecks", "CardSleeves", "EquilibriumDeck", "MobileMemFix"]
+    },
+    "stacking": {
+      "label": "Showman + stacking jokers",
+      "description": "Like 'showman', plus Stacking Jokers: duplicates fold into one card and multiply its effect (Bean's videos).",
+      "enabled": ["smods", "Multiplayer", "Handy", "ShenanigansDecks", "CardSleeves", "EquilibriumDeck", "MobileMemFix", "StackingJokers"]
+    },
+    "pokermon": {
+      "label": "Pokermon",
+      "description": "Every joker is a Pokemon. Heavy art: MobileMemFix keeps it under ~1 GB on phones.",
+      "enabled": ["smods", "Multiplayer", "Handy", "Pokermon", "MobileMemFix"]
+    },
+    "everything": {
+      "label": "Everything on",
+      "description": "All content mods at once: Pokermon, modded decks, sleeves and stacking.",
+      "enabled": ["smods", "Multiplayer", "Handy", "Pokermon", "ShenanigansDecks", "CardSleeves", "EquilibriumDeck", "MobileMemFix", "StackingJokers"]
+    },
+    "vanilla-mp": {
+      "label": "Vanilla Multiplayer",
+      "description": "Only what online play needs. Pick the Vanilla ruleset in the lobby for the untouched game.",
+      "enabled": ["smods", "Multiplayer", "Handy"]
+    }
+  }
+}

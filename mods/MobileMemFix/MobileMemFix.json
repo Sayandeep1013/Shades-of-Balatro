@@ -1,0 +1,12 @@
+{
+  "id": "MobileMemFix",
+  "name": "Mobile Memory Fix",
+  "display_name": "MobileMemFix",
+  "author": ["Shades of Balatro"],
+  "description": "Frees the CPU-side copy of every mod sprite sheet after it is uploaded to the GPU. Cuts RAM use of big content mods (e.g. Pokermon) on phones. No gameplay changes.",
+  "prefix": "mmf",
+  "main_file": "main.lua",
+  "priority": -1000,
+  "version": "1.0.0",
+  "dependencies": ["Steamodded (>=1.0.0~BETA-1620a)"]
+}

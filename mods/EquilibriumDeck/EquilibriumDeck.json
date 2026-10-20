@@ -1,0 +1,14 @@
+{
+  "id": "EquilibriumDeck",
+  "name": "Deck of Equilibrium",
+  "display_name": "Equilibrium",
+  "author": ["Cryptid team (original)", "standalone port"],
+  "description": "Cryptid's Deck of Equilibrium as a standalone deck: every Joker, consumable, voucher, booster and playing card has the same chance to appear in any shop slot. Start with Overstock + Overstock Plus. Vanilla content only, no Cryptid needed.",
+  "prefix": "eqd",
+  "main_file": "main.lua",
+  "priority": 0,
+  "badge_colour": "708B91",
+  "badge_text_colour": "FFFFFF",
+  "version": "1.0.0",
+  "dependencies": ["Steamodded (>=1.0.0~BETA-1620a)"]
+}

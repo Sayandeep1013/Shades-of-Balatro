@@ -1,0 +1,11 @@
+# Never commit game files, builds or personal saves.
+*.exe
+*.love
+*.apk
+*.jkr
+Balatro/
+game/
+Mods-backup*/
+ShadesBackups/
+cache/
+*.log
