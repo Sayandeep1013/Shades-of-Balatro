@@ -33,6 +33,7 @@ param(
     [string]$ModsDir = (Join-Path $env:APPDATA 'Balatro\Mods'),
     [string]$Source,
     [string]$Ref = 'main',
+    [string]$Apk,
     [switch]$NoShortcuts,
     [switch]$Yes
 )
@@ -503,13 +504,18 @@ function Invoke-Phone {
     $a = @('-s', $serial)
 
     Step 'App'
-    $apk = Join-Path $Cache $android.apk_asset
-    New-Item -ItemType Directory -Force $Cache | Out-Null
-    $base = "https://github.com/$Repo/releases/latest/download"
-    Say "         downloading $base/$($android.apk_asset)"
-    Invoke-WebRequest -Uri "$base/$($android.apk_asset)" -OutFile $apk -UseBasicParsing
-    $want = ((Invoke-WebRequest -Uri "$base/$($android.apk_asset).sha256" -UseBasicParsing).Content -split '\s+')[0]
-    if ((Get-FileHash $apk -Algorithm SHA256).Hash -ne $want.ToUpper()) { throw 'The downloaded APK does not match its published SHA-256. Try again later.' }
+    if ($Apk) {
+        $apk = (Resolve-Path $Apk).Path   # local build, for testing before a release
+        Say "         using local APK $apk"
+    } else {
+        $apk = Join-Path $Cache $android.apk_asset
+        New-Item -ItemType Directory -Force $Cache | Out-Null
+        $base = "https://github.com/$Repo/releases/latest/download"
+        Say "         downloading $base/$($android.apk_asset)"
+        Invoke-WebRequest -Uri "$base/$($android.apk_asset)" -OutFile $apk -UseBasicParsing
+        $want = ((Invoke-WebRequest -Uri "$base/$($android.apk_asset).sha256" -UseBasicParsing).Content -split '\s+')[0]
+        if ((Get-FileHash $apk -Algorithm SHA256).Hash -ne $want.ToUpper()) { throw 'The downloaded APK does not match its published SHA-256. Try again later.' }
+    }
     $res = Invoke-AdbRaw $adb ($a + @('install', '-r', $apk))
     if (($res -join ' ') -match 'INSTALL_FAILED_UPDATE_INCOMPATIBLE') {
         throw "An older Shades of Balatro signed with a different key is installed. Uninstall it from the phone (its saves go with it) and run this again."
