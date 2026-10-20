@@ -35,8 +35,7 @@ jobs:
           VERSION_NAME: ${{ steps.v.outputs.name }}
           VERSION_CODE: ${{ steps.v.outputs.code }}
         run: |
-          printf "%s" "$SHADES_KEYSTORE_B64" | tr -d "
- " | base64 -d > "$RUNNER_TEMP/shades.jks"
+          printf '%s' "$SHADES_KEYSTORE_B64" | tr -d '\r\n ' | base64 -d > "$RUNNER_TEMP/shades.jks"
           SHADES_KEYSTORE="$RUNNER_TEMP/shades.jks" bash android/build-apk.sh
           cd android/dist
           cp "ShadesOfBalatro-$VERSION_NAME.apk" ShadesOfBalatro.apk
