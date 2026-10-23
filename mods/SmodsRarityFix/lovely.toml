@@ -1,0 +1,21 @@
+# Steamodded 1620a patches get_current_pool (smods/lovely/rarity.toml) so it accepts rarity
+# names like "Uncommon". Its regex expects a trailing space after the first line. Some copies
+# of Balatro 1.0.1o don't have that space, so the patch silently fails ("no matches" in the
+# Lovely log) and any mod asking for a pool by rarity name crashes with "attempt to compare
+# number with string" (Joker Crafting does, when it rolls the offers).
+# Same payload as Steamodded, with a pattern that ignores the whitespace. On a copy where
+# Steamodded's own patch applied, this one finds nothing and does nothing.
+[manifest]
+version = "1.0.0"
+priority = 0
+
+[[patches]]
+[patches.regex]
+target = "functions/common_events.lua"
+pattern = '''(?<indent>[\t ]*)local rarity = _rarity or pseudorandom\('rarity'\.\.G\.GAME\.round_resets\.ante\.\.\(_append or ''\)\)[ \t]*\r?\n[ \t]*rarity = \(_legendary and 4\) or \(rarity > 0\.95 and 3\) or \(rarity > 0\.7 and 2\) or 1'''
+position = "at"
+payload = '''
+_rarity = (_legendary and 4) or (type(_rarity) == "number" and ((_rarity > 0.95 and 3) or (_rarity > 0.7 and 2) or 1)) or _rarity
+_rarity = ({Common = 1, Uncommon = 2, Rare = 3, Legendary = 4})[_rarity] or _rarity
+local rarity = _rarity or SMODS.poll_rarity("Joker", 'rarity'..G.GAME.round_resets.ante..(_append or ''))
+'''

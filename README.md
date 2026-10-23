@@ -42,9 +42,9 @@ Android: `ShadesOfBalatro.apk` on the same page, set up from your PC with `shade
   seed, so different mod versions mean different shops. Here, everyone gets the same files.
 - **It checks and repairs.** `shades check` reports what's installed against the modpack.
   `shades install` fixes only what's wrong, and moves anything it replaces into a dated backup folder.
-- **Presets for every mix.** Vanilla jokers, Pokermon, stacking jokers, everything at once, or
-  plain Multiplayer. Mods are switched on and off, never deleted, so changing preset is instant.
-- **Two mods written for this pack:**
+- **Presets for every mix.** Vanilla jokers, Pokermon, stacking jokers, joker crafting, everything
+  at once, or plain Multiplayer. Mods are switched on and off, never deleted, so changing preset is instant.
+- **Three mods written for this pack:**
   - **Mobile Memory Fix.** Pokermon's art takes about 2.4 GB of RAM once loaded, and Steamodded kept
     a second copy of every sprite sheet. On an 8 GB phone that meant ~2.7 GB in use and an
     out-of-memory kill, which looked like the whole phone crashing. The fix drops the spare copies and
@@ -52,6 +52,14 @@ Android: `ShadesOfBalatro.apk` on the same page, set up from your PC with `shade
   - **Deck of Equilibrium.** Cryptid's deck on its own, with no Cryptid needed: every joker (Legendaries
     included), consumable, voucher, pack and playing card has the same chance in every shop slot, and
     you start with Overstock + Overstock Plus. Ported from Cryptid's GPL-3 source and art.
+  - **Steamodded Rarity Fix.** Steamodded patches the game so mods can ask for jokers by rarity
+    name ("Uncommon"). On some copies of Balatro that patch silently fails over one missing space,
+    and the first mod that asks crashes. This applies the same patch in a way that ignores the
+    spacing, and does nothing on copies where Steamodded's own patch worked.
+- **Joker Crafting, when you want it.** [Joker Crafting](https://github.com/nicktg0423/JokerCrafting)
+  from Bean's "craft your Jokers" video: every joker is a Common, and you drag one Joker onto another
+  of the same rarity to craft the next tier (pick 1 of 3), up to Legendary. It changes every run, so
+  it's **off unless you pick the `crafting` preset**.
 - **No more `naninf`.** [Amulet](https://github.com/frostice482/amulet) (the maintained
   continuation of Talisman) is in every content preset. Scores past vanilla's e308 limit show up as
   `1e400`, `ee12` and so on, where they used to break into `naninf`. It works with Multiplayer.
@@ -66,6 +74,7 @@ Android: `ShadesOfBalatro.apk` on the same page, set up from your PC with `shade
 | `stacking` | `showman` + Stacking Jokers | Duplicates fold into one card and multiply it: 3x Photograph = X8 |
 | `pokermon` | Steamodded, Multiplayer, Handy, Amulet, Pokermon, Mobile Memory Fix | Every joker is a Pokemon |
 | `everything` | All of the above | Chaos |
+| `crafting` | Steamodded, Multiplayer, Handy, Amulet, Mobile Memory Fix, Joker Crafting, Steamodded Rarity Fix | Every joker is a Common; craft two of a rarity into the next, up to Legendary |
 | `vanilla-mp` | Steamodded, Multiplayer, Handy | Online play only. Pick the **Vanilla** ruleset for the untouched game |
 
 Pure single-player vanilla needs no preset: the **Balatro (Vanilla)** shortcut starts the game with
@@ -190,10 +199,12 @@ was verified on Windows with the same LÖVE 11.5; the first on-phone run of the 
 | [Shenanigans's Decks](https://github.com/ShenanigansBunul/balatro-shenanigans-decks) | 1.2 | 31 decks including the **Showman Deck** | MIT |
 | [Card Sleeves](https://github.com/larswijn/CardSleeves) | 1.9.4 | Sleeves, used by Shenanigans's Decks | GPL-3.0 |
 | [Stacking Jokers](https://github.com/Michael-Andrzejewski/Stacking-Jokers) | 0.3.0 | Always-on Showman, duplicates stack and multiply. Made for Bean's videos | none published: downloaded, never redistributed |
+| [Joker Crafting](https://github.com/nicktg0423/JokerCrafting) | 1.0.0 | Every joker is a Common; drag two of a rarity together to craft the next, up to Legendary. From Bean's videos. Only on in `crafting` | MIT |
 | [Mobile Memory Fix](mods/MobileMemFix) | 1.0.0 | Phone RAM fix, written for this pack | GPL-3.0 |
 | [Deck of Equilibrium](mods/EquilibriumDeck) | 1.0.0 | Cryptid's deck, standalone | GPL-3.0 |
+| [Steamodded Rarity Fix](mods/SmodsRarityFix) | 1.0.0 | Re-applies a Steamodded patch that fails on some game copies. Needed by Joker Crafting | GPL-3.0 |
 
-Only the last two live in this repository. Everything else is fetched from its author's own
+Only the last three live in this repository. Everything else is fetched from its author's own
 release when you install, so this repo never redistributes anyone's work.
 
 **Want Cryptid?** Cryptid 0.5.17 needs Steamodded 26.829+, which is newer than the Steamodded
@@ -202,7 +213,7 @@ in the pack.
 
 ## How it's built
 
-PowerShell 5.1 (built into Windows) for the installer, Lua for the two mods. No runtime to install.
+PowerShell 5.1 (built into Windows) for the installer, Lua for the mods written here. No runtime to install.
 
 ```
 shades.ps1            the installer: find Balatro, Lovely, pinned downloads + SHA-256, presets, shortcuts, check, phone, uninstall
@@ -214,6 +225,7 @@ android/icon/         original icon, drawn in code
 modpack.json          the pack: every mod's version, URL, SHA-256 and folder, plus the presets
 mods/MobileMemFix/    frees spare sprite-sheet copies; 1x art for oversized mods on phones
 mods/EquilibriumDeck/ Cryptid's Deck of Equilibrium on its own (shop hooks + save/load patch + deck art)
+mods/SmodsRarityFix/  Steamodded's string-rarity patch for get_current_pool, with a whitespace-tolerant pattern
 docs/screenshots/     taken on a Nothing Phone (3a) and a Windows PC while testing
 ```
 
@@ -244,6 +256,9 @@ How the installer works:
 | Pokermon without running out of memory | ✅ (~2.5 GB) | ✅ (~1.0 GB with Mobile Memory Fix) |
 | Backgrounding the app mid-match, reconnecting | n/a | ✅ |
 | Amulet: a hand worth e400 against an e500 blind shows `1e400`, not `naninf` | ✅ | ✅ |
+| Joker Crafting: 25 shop rerolls, every joker Common | ✅ 32/32 | ✅ 32/32 (Pokermon on) |
+| Joker Crafting: Common → Uncommon → Rare → Legendary, drag, Craft, pick, Confirm | ✅ | ✅ by real touch drag |
+| Joker Crafting: two different rarities are refused | ✅ | not separately tested |
 
 ## Status
 
@@ -252,6 +267,7 @@ How the installer works:
 | v1.0.0 | Windows installer, five presets, Mobile Memory Fix, Deck of Equilibrium |
 | v1.1.0 | Game-free Android APK built in CI; `shades phone` installs it over USB with your own `Balatro.exe`, mods and preset |
 | v1.2.0 | Amulet added to every content preset: no more `naninf` above e308 |
+| v1.3.0 | Joker Crafting as an opt-in `crafting` preset, plus Steamodded Rarity Fix |
 | Next | Confirm the APK on more phones; an in-app file picker for `Balatro.exe` |
 
 ## Credits
@@ -265,7 +281,8 @@ How the installer works:
   [Amulet](https://github.com/frostice482/amulet) (frostice482, from Talisman by MathIsFun_ and the SpectralPack team),
   [Pokermon](https://github.com/InertSteak/Pokermon) (InertSteak), [Shenanigans's Decks](https://github.com/ShenanigansBunul/balatro-shenanigans-decks)
   (Shenanigans), [Card Sleeves](https://github.com/larswijn/CardSleeves) (Larswijn),
-  [Stacking Jokers](https://github.com/Michael-Andrzejewski/Stacking-Jokers) (Soareverix).
+  [Stacking Jokers](https://github.com/Michael-Andrzejewski/Stacking-Jokers) (Soareverix),
+  [Joker Crafting](https://github.com/nicktg0423/JokerCrafting) (NickTG).
 - **Deck of Equilibrium** code and art from [Cryptid](https://github.com/SpectralPack/Cryptid)
   (MathIsFun_ and the Cryptid team), GPL-3.0.
 - Inspired by [Bean](https://www.youtube.com/@BeanBalatro)'s modded Multiplayer videos.

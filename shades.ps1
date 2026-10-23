@@ -227,6 +227,9 @@ function Get-InstalledVersion([string]$folder, $mod) {
             if ($meta.id -and $meta.version) { return [string]$meta.version }
         } catch { }
     }
+    # Lovely-only mods (no JSON) carry their version in lovely.toml's [manifest].
+    $toml = Join-Path $folder 'lovely.toml'
+    if ((Test-Path $toml) -and ((Get-Content $toml -Raw) -match '(?m)^version\s*=\s*"([^"]+)"')) { return $Matches[1] }
     return 'unknown'
 }
 

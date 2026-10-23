@@ -1,6 +1,6 @@
 {
   "name": "Shades of Balatro",
-  "modpack_version": "1.2.0",
+  "modpack_version": "1.3.0",
   "balatro_version": "1.0.1o",
   "steam_app_id": 2379780,
   "lovely": {
@@ -103,6 +103,17 @@
       "home": "https://github.com/Michael-Andrzejewski/Stacking-Jokers"
     },
     {
+      "id": "JokerCrafting",
+      "name": "Joker Crafting",
+      "version": "1.0.0",
+      "folder": "JokerCrafting",
+      "url": "https://github.com/nicktg0423/JokerCrafting/archive/refs/tags/v1.0.0.zip",
+      "sha256": "8fc0c84a507b583a5e70d334320b95ac78404e3d8b024279e69c3c0be33d1dd9",
+      "marker": "JokerCrafting.json",
+      "license": "MIT",
+      "home": "https://github.com/nicktg0423/JokerCrafting"
+    },
+    {
       "id": "MobileMemFix",
       "name": "Mobile Memory Fix",
       "version": "1.0.0",
@@ -118,6 +129,15 @@
       "folder": "EquilibriumDeck",
       "local": "mods/EquilibriumDeck",
       "license": "GPL-3.0 (port of Cryptid's deck)",
+      "home": "https://github.com/Sayandeep1013/Shades-of-Balatro"
+    },
+    {
+      "id": "SmodsRarityFix",
+      "name": "Steamodded Rarity Fix",
+      "version": "1.0.0",
+      "folder": "SmodsRarityFix",
+      "local": "mods/SmodsRarityFix",
+      "license": "GPL-3.0",
       "home": "https://github.com/Sayandeep1013/Shades-of-Balatro"
     }
   ],
@@ -152,6 +172,11 @@
       "label": "Everything on",
       "description": "All content mods at once: Pokermon, modded decks, sleeves and stacking.",
       "enabled": ["smods", "Multiplayer", "Handy", "Pokermon", "ShenanigansDecks", "CardSleeves", "EquilibriumDeck", "MobileMemFix", "StackingJokers", "Amulet"]
+    },
+    "crafting": {
+      "label": "Joker Crafting",
+      "description": "Every joker is a Common. Drag one onto another of the same rarity to craft the next tier, up to Legendary (Bean's videos).",
+      "enabled": ["smods", "Multiplayer", "Handy", "Amulet", "MobileMemFix", "JokerCrafting", "SmodsRarityFix"]
     },
     "vanilla-mp": {
       "label": "Vanilla Multiplayer",
