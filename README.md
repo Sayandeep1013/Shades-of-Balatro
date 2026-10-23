@@ -52,6 +52,9 @@ Android: `ShadesOfBalatro.apk` on the same page, set up from your PC with `shade
   - **Deck of Equilibrium.** Cryptid's deck on its own, with no Cryptid needed: every joker (Legendaries
     included), consumable, voucher, pack and playing card has the same chance in every shop slot, and
     you start with Overstock + Overstock Plus. Ported from Cryptid's GPL-3 source and art.
+- **No more `naninf`.** [Amulet](https://github.com/frostice482/amulet) (the maintained
+  continuation of Talisman) is in every content preset. Scores past vanilla's e308 limit show up as
+  `1e400`, `ee12` and so on, where they used to break into `naninf`. It works with Multiplayer.
 - **Nothing from Balatro is shared.** The tool never downloads or uploads game files. Each player
   uses their own copy.
 
@@ -59,9 +62,9 @@ Android: `ShadesOfBalatro.apk` on the same page, set up from your PC with `shade
 
 | Preset | What's on | For |
 |---|---|---|
-| `showman` *(default)* | Steamodded, Multiplayer, Handy, Shenanigans's Decks, Card Sleeves, Deck of Equilibrium, Mobile Memory Fix | Modded decks (Showman, Equilibrium, 31 more) with the normal joker pool |
+| `showman` *(default)* | Steamodded, Multiplayer, Handy, Amulet, Shenanigans's Decks, Card Sleeves, Deck of Equilibrium, Mobile Memory Fix | Modded decks (Showman, Equilibrium, 31 more) with the normal joker pool |
 | `stacking` | `showman` + Stacking Jokers | Duplicates fold into one card and multiply it: 3x Photograph = X8 |
-| `pokermon` | Steamodded, Multiplayer, Handy, Pokermon, Mobile Memory Fix | Every joker is a Pokemon |
+| `pokermon` | Steamodded, Multiplayer, Handy, Amulet, Pokermon, Mobile Memory Fix | Every joker is a Pokemon |
 | `everything` | All of the above | Chaos |
 | `vanilla-mp` | Steamodded, Multiplayer, Handy | Online play only. Pick the **Vanilla** ruleset for the untouched game |
 
@@ -182,6 +185,7 @@ was verified on Windows with the same LÖVE 11.5; the first on-phone run of the 
 | [Steamodded](https://github.com/Steamodded/smods) | 1.0.0~BETA-1620a | Mod loader. The version Multiplayer standardises on | GPL-3.0 |
 | [Balatro Multiplayer](https://balatromp.com) | 0.5.5 | Lobbies, PvP blinds, lives, rulesets | GPL-3.0 |
 | [Handy](https://github.com/SleepyG11/HandyBalatro) | 2.0.6 | Speed and control shortcuts. Multiplayer-approved | GPL-3.0 |
+| [Amulet](https://github.com/frostice482/amulet) | 3.6.1 | Scores above e308 instead of `naninf`. Talisman's maintained fork, with Multiplayer support | GPL-3.0 |
 | [Pokermon](https://github.com/InertSteak/Pokermon) | 3.8.0 | Every joker is a Pokemon. The release built for Steamodded 1620a | GPL-3.0 |
 | [Shenanigans's Decks](https://github.com/ShenanigansBunul/balatro-shenanigans-decks) | 1.2 | 31 decks including the **Showman Deck** | MIT |
 | [Card Sleeves](https://github.com/larswijn/CardSleeves) | 1.9.4 | Sleeves, used by Shenanigans's Decks | GPL-3.0 |
@@ -192,8 +196,9 @@ was verified on Windows with the same LÖVE 11.5; the first on-phone run of the 
 Only the last two live in this repository. Everything else is fetched from its author's own
 release when you install, so this repo never redistributes anyone's work.
 
-**Want Cryptid?** Cryptid 0.5.17 needs Steamodded 26.829+ and its Amulet library, newer than the
-Steamodded Multiplayer standardises on, so it's not in this pack.
+**Want Cryptid?** Cryptid 0.5.17 needs Steamodded 26.829+, which is newer than the Steamodded
+Multiplayer standardises on, so it's not in this pack. Amulet, the other thing it needs, is already
+in the pack.
 
 ## How it's built
 
@@ -238,6 +243,7 @@ How the installer works:
 | Deck of Equilibrium: quit and continue mid-shop | ✅ | not separately tested |
 | Pokermon without running out of memory | ✅ (~2.5 GB) | ✅ (~1.0 GB with Mobile Memory Fix) |
 | Backgrounding the app mid-match, reconnecting | n/a | ✅ |
+| Amulet: a hand worth e400 against an e500 blind shows `1e400`, not `naninf` | ✅ | ✅ |
 
 ## Status
 
@@ -245,6 +251,7 @@ How the installer works:
 |---|---|
 | v1.0.0 | Windows installer, five presets, Mobile Memory Fix, Deck of Equilibrium |
 | v1.1.0 | Game-free Android APK built in CI; `shades phone` installs it over USB with your own `Balatro.exe`, mods and preset |
+| v1.2.0 | Amulet added to every content preset: no more `naninf` above e308 |
 | Next | Confirm the APK on more phones; an in-app file picker for `Balatro.exe` |
 
 ## Credits
@@ -255,6 +262,7 @@ How the installer works:
   [Lovely Mobile Maker](https://github.com/WilsontheWolf/lovely-mobile-maker) (WilsontheWolf).
 - [Steamodded](https://github.com/Steamodded/smods), [Balatro Multiplayer](https://github.com/Balatro-Multiplayer/BalatroMultiplayer)
   (Virtualized and contributors), [Handy](https://github.com/SleepyG11/HandyBalatro) (SleepyG11),
+  [Amulet](https://github.com/frostice482/amulet) (frostice482, from Talisman by MathIsFun_ and the SpectralPack team),
   [Pokermon](https://github.com/InertSteak/Pokermon) (InertSteak), [Shenanigans's Decks](https://github.com/ShenanigansBunul/balatro-shenanigans-decks)
   (Shenanigans), [Card Sleeves](https://github.com/larswijn/CardSleeves) (Larswijn),
   [Stacking Jokers](https://github.com/Michael-Andrzejewski/Stacking-Jokers) (Soareverix).

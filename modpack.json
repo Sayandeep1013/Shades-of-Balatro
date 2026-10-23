@@ -1,6 +1,6 @@
 {
   "name": "Shades of Balatro",
-  "modpack_version": "1.0.0",
+  "modpack_version": "1.2.0",
   "balatro_version": "1.0.1o",
   "steam_app_id": 2379780,
   "lovely": {
@@ -46,6 +46,17 @@
       "marker": "metadata.json",
       "license": "GPL-3.0",
       "home": "https://github.com/SleepyG11/HandyBalatro"
+    },
+    {
+      "id": "Amulet",
+      "name": "Amulet",
+      "version": "3.6.1",
+      "folder": "Amulet",
+      "url": "https://github.com/frostice482/amulet/releases/download/3.6.1/Amulet.zip",
+      "sha256": "be7baa7f3e97690fadf7effb8fa230521d4977ade39f69c9c6ea8f71060fa96d",
+      "marker": "talisman.lua",
+      "license": "GPL-3.0",
+      "home": "https://github.com/frostice482/amulet"
     },
     {
       "id": "Pokermon",
@@ -125,22 +136,22 @@
     "showman": {
       "label": "Showman + vanilla jokers",
       "description": "Modded decks (Showman, Equilibrium, 31 Shenanigans decks, sleeves) with the normal joker pool.",
-      "enabled": ["smods", "Multiplayer", "Handy", "ShenanigansDecks", "CardSleeves", "EquilibriumDeck", "MobileMemFix"]
+      "enabled": ["smods", "Multiplayer", "Handy", "ShenanigansDecks", "CardSleeves", "EquilibriumDeck", "MobileMemFix", "Amulet"]
     },
     "stacking": {
       "label": "Showman + stacking jokers",
       "description": "Like 'showman', plus Stacking Jokers: duplicates fold into one card and multiply its effect (Bean's videos).",
-      "enabled": ["smods", "Multiplayer", "Handy", "ShenanigansDecks", "CardSleeves", "EquilibriumDeck", "MobileMemFix", "StackingJokers"]
+      "enabled": ["smods", "Multiplayer", "Handy", "ShenanigansDecks", "CardSleeves", "EquilibriumDeck", "MobileMemFix", "StackingJokers", "Amulet"]
     },
     "pokermon": {
       "label": "Pokermon",
       "description": "Every joker is a Pokemon. Heavy art: MobileMemFix keeps it under ~1 GB on phones.",
-      "enabled": ["smods", "Multiplayer", "Handy", "Pokermon", "MobileMemFix"]
+      "enabled": ["smods", "Multiplayer", "Handy", "Pokermon", "MobileMemFix", "Amulet"]
     },
     "everything": {
       "label": "Everything on",
       "description": "All content mods at once: Pokermon, modded decks, sleeves and stacking.",
-      "enabled": ["smods", "Multiplayer", "Handy", "Pokermon", "ShenanigansDecks", "CardSleeves", "EquilibriumDeck", "MobileMemFix", "StackingJokers"]
+      "enabled": ["smods", "Multiplayer", "Handy", "Pokermon", "ShenanigansDecks", "CardSleeves", "EquilibriumDeck", "MobileMemFix", "StackingJokers", "Amulet"]
     },
     "vanilla-mp": {
       "label": "Vanilla Multiplayer",
